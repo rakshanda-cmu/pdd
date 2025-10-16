@@ -1,0 +1,1 @@
+write a python function "calculator" which does the basic 4 functions of the calculations, it should ask user for the input and the opertations to perform on the input numbers. It should display the operation performed and the result.

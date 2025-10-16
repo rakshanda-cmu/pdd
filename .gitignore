@@ -191,3 +191,8 @@ staging/
 
 # Testmon cache
 .testmon*
+
+# RealMetric models and cache
+examples/RealMetric/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+examples/RealMetric/models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+examples/RealMetric/models/.cache/*

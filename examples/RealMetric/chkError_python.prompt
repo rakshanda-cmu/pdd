@@ -1,0 +1,21 @@
+check the below errors:
+
+Traceback (most recent call last):
+  File "/Users/ggare/Documents/Rakshanda MS/Sem1/Job Applications/PromptDriven/pdd/examples/RealMetric/predictPrice.py", line 277, in <module>
+    embedding_model, embedding_tokenizer = setup_embedding_model()
+                                           ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/ggare/Documents/Rakshanda MS/Sem1/Job Applications/PromptDriven/pdd/examples/RealMetric/predictPrice.py", line 173, in setup_embedding_model
+    model = AutoModel.from_pretrained(model_name)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ggare/Documents/Rakshanda MS/Sem1/Job Applications/PerforatedAI/PerforatedAI/PerforatedAI-Transformers/src/transformers/utils/import_utils.py", line 1756, in __getattribute__
+    requires_backends(cls, cls._backends)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ggare/Documents/Rakshanda MS/Sem1/Job Applications/PerforatedAI/PerforatedAI/PerforatedAI-Transformers/src/transformers/utils/import_utils.py", line 1744, in requires_backends
+    raise ImportError("".join(failed))
+ImportError:
+AutoModel requires the PyTorch library but it was not found in your environment. Checkout the instructions on the
+installation page: https://pytorch.org/get-started/locally/ and follow the ones that match your environment.
+Please note that you may need to restart your runtime after installation.
+
+
+In the predictPric.py file and update that python file
