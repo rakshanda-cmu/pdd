@@ -423,20 +423,6 @@ def render_rag_qa(df):
             # 3. Construct the prompt for the LLM (the "Generation" part)
             context = "\n\n".join([f"Listing {i+1}: {remark}" for i, remark in enumerate(retrieved_remarks)])
             
-            # prompt_template = f"""
-            # <|system|>
-            # You are a helpful real estate assistant. Your task is to answer the user's question based *only* on the context provided below.
-            # If the context does not contain the answer, state that you cannot find the information in the provided listings.
-            # Do not make up information. Be concise and directly answer the question.</s>
-            # <|user|>
-            # CONTEXT:
-            # ---
-            # {context}
-            # ---
-            # QUESTION: {user_question}</s>
-            # <|assistant|>
-            # """
-
             prompt_template = f"""
             <|system|>
             You are a helpful real estate assistant. Your task is to answer the user's question based *only* on the context provided below.
@@ -447,7 +433,7 @@ def render_rag_qa(df):
             ---
             {context}
             ---
-            QUESTION: Do any of the listings have {user_question}? Answer yes or no, followed by a brief explanation.</s>
+            QUESTION: {user_question}</s>
             <|assistant|>
             """
             

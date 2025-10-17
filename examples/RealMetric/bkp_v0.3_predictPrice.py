@@ -423,20 +423,6 @@ def render_rag_qa(df):
             # 3. Construct the prompt for the LLM (the "Generation" part)
             context = "\n\n".join([f"Listing {i+1}: {remark}" for i, remark in enumerate(retrieved_remarks)])
             
-            # prompt_template = f"""
-            # <|system|>
-            # You are a helpful real estate assistant. Your task is to answer the user's question based *only* on the context provided below.
-            # If the context does not contain the answer, state that you cannot find the information in the provided listings.
-            # Do not make up information. Be concise and directly answer the question.</s>
-            # <|user|>
-            # CONTEXT:
-            # ---
-            # {context}
-            # ---
-            # QUESTION: {user_question}</s>
-            # <|assistant|>
-            # """
-
             prompt_template = f"""
             <|system|>
             You are a helpful real estate assistant. Your task is to answer the user's question based *only* on the context provided below.
@@ -447,14 +433,13 @@ def render_rag_qa(df):
             ---
             {context}
             ---
-            QUESTION: Do any of the listings have {user_question}? Answer yes or no, followed by a brief explanation.</s>
+            QUESTION: {user_question}</s>
             <|assistant|>
             """
             
             # 4. Get the LLM's response
             try:
-                # output = llm(prompt_template, max_tokens=250, stop=["<|user|>"], echo=False)
-                output = llm(prompt_template, max_tokens=500, stop=["<|user|>"], echo=False)
+                output = llm(prompt_template, max_tokens=250, stop=["<|user|>"], echo=False)
                 answer = output['choices'][0]['text'].strip()
                 
                 st.subheader("Answer:")
@@ -464,23 +449,9 @@ def render_rag_qa(df):
                 with st.expander("Show Retrieved Context (What the AI used to answer)"):
                     st.info("The AI's answer is based on the following property remarks:")
                     for i, idx in enumerate(retrieved_indices):
-                        # st.markdown(f"**Source {i+1} (Listing from {df.iloc[idx]['city']}):**")
-                        # st.write(f"> {df.iloc[idx]['remarks']}")
+                        st.markdown(f"**Source {i+1} (Listing from {df.iloc[idx]['city']}):**")
+                        st.write(f"> {df.iloc[idx]['remarks']}")
 
-                        # Using a more structured layout
-                        listing_row = df.iloc[idx]
-                        price_str = f"${int(listing_row.get('price', 0)):,}" if pd.notna(listing_row.get('price')) else "N/A"
-
-                        st.markdown(f"""
-                            **Source {i+1} (Listing from {df.iloc[idx]['city']}):**
-                            - **ID:** `{listing_row['id']}`
-                            - **Address:** {listing_row.get('address', 'N/A')}
-                            - **Price:** {price_str}
-                            - **Beds:** {listing_row.get('beds', 'N/A')} | **Baths:** {listing_row.get('baths', 'N/A')}
-                            """)
-                        # st.markdown(f"**Remarks:**")
-                        # st.info(f"{listing_row['remarks']}")
-                        st.write(f"Remarks: {df.iloc[idx]['remarks']}")
             except Exception as e:
                 st.error(f"An error occurred while generating the answer: {e}")
 
