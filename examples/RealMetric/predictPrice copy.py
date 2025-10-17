@@ -279,6 +279,23 @@ def find_top_k_similar(query_embedding, corpus_embeddings, k=3):
     top_k_indices = np.argsort(similarities)[-k:][::-1]
     return top_k_indices
 
+def llama_generate_summary_prompt(row):
+    """Creates a prompt for the LLM to generate a listing summary."""
+    # Note: The f-string formatting is corrected from the user prompt's example.
+    # Added formatting for price and safe .get() for all fields.
+    price_str = f"${int(row.get('price', 0)):,}" if pd.notna(row.get('price')) else "N/A"
+    
+    prompt = (
+        "Write a 2-3 sentence listing summary including address, price, beds, baths and a short supporting remark.\n\n"
+        f"Address: {row.get('address', 'N/A')}\n"
+        f"Price: {price_str}\n"
+        f"Beds: {row.get('beds', 'N/A')}\n"
+        f"Baths: {row.get('baths', 'N/A')}\n"
+        f"Remarks: {row.get('remarks', 'N/A')}\n\n"
+        "Summary:"
+    )
+    return prompt
+
 # --- 3. STREAMLIT UI ---
 
 def main():
@@ -439,8 +456,7 @@ def render_rag_qa(df):
             
             # 4. Get the LLM's response
             try:
-                # output = llm(prompt_template, max_tokens=250, stop=["<|user|>"], echo=False)
-                output = llm(prompt_template, max_tokens=500, stop=["<|user|>"], echo=False)
+                output = llm(prompt_template, max_tokens=250, stop=["<|user|>"], echo=False)
                 answer = output['choices'][0]['text'].strip()
                 
                 st.subheader("Answer:")
@@ -448,25 +464,52 @@ def render_rag_qa(df):
 
                 # To handle the "incorrect answers" problem, we show the user the exact context the LLM used.
                 with st.expander("Show Retrieved Context (What the AI used to answer)"):
-                    st.info("The AI's answer is based on the following property remarks:")
-                    for i, idx in enumerate(retrieved_indices):
-                        # st.markdown(f"**Source {i+1} (Listing from {df.iloc[idx]['city']}):**")
-                        # st.write(f"> {df.iloc[idx]['remarks']}")
+                    st.info("The AI's answer is based on the following property listings. A summary for each has been generated.")
+                    with st.spinner("Generating summaries for retrieved listings..."):
+                        for i, idx in enumerate(retrieved_indices):
+                            listing_row = df.iloc[idx]
+                            
+                            # --- AUTOMATIC SUMMARY GENERATION ---
+                            summary = "Could not generate summary." # Default value
+                            try:
+                                # 1. Create the summary prompt
+                                summary_prompt_text = llama_generate_summary_prompt(listing_row)
+                                
+                                # 2. Format it for the chat model
+                                summary_prompt_template = f"""
+                                <|system|>
+                                You are a helpful real estate assistant. Your task is to generate a concise 2-3 sentence summary for a property listing based on the provided details.</s>
+                                <|user|>
+                                {summary_prompt_text}</s>
+                                <|assistant|>
+                                """
+                                
+                                # 3. Call the LLM
+                                summary_output = llm(summary_prompt_template, max_tokens=150, stop=["<|user|>"], echo=False)
+                                summary = summary_output['choices'][0]['text'].strip()
+                            except Exception as e:
+                                # Log the error but don't stop the app
+                                st.warning(f"Could not generate summary for listing {listing_row['id']}. Error: {e}")
 
-                        # Using a more structured layout
-                        listing_row = df.iloc[idx]
-                        price_str = f"${int(listing_row.get('price', 0)):,}" if pd.notna(listing_row.get('price')) else "N/A"
+                            # --- DISPLAY STRUCTURED INFO ---
+                            st.markdown(f"---")
+                            st.markdown(f"#### Source {i+1}: Listing from {listing_row['city']}")
+                            
+                            # Format price for better display
+                            price_str = f"${int(listing_row.get('price', 0)):,}" if pd.notna(listing_row.get('price')) else "N/A"
 
-                        st.markdown(f"""
-                            **Source {i+1} (Listing from {df.iloc[idx]['city']}):**
+                            # Using a more structured layout
+                            st.markdown(f"""
                             - **ID:** `{listing_row['id']}`
                             - **Address:** {listing_row.get('address', 'N/A')}
                             - **Price:** {price_str}
                             - **Beds:** {listing_row.get('beds', 'N/A')} | **Baths:** {listing_row.get('baths', 'N/A')}
                             """)
-                        # st.markdown(f"**Remarks:**")
-                        # st.info(f"{listing_row['remarks']}")
-                        st.write(f"Remarks: {df.iloc[idx]['remarks']}")
+                            st.markdown(f"**Remarks:**")
+                            st.info(f"{listing_row['remarks']}")
+                            st.markdown(f"**Generated Summary:**")
+                            st.success(f"{summary}")
+
             except Exception as e:
                 st.error(f"An error occurred while generating the answer: {e}")
 

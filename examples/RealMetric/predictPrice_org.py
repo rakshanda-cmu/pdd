@@ -439,8 +439,7 @@ def render_rag_qa(df):
             
             # 4. Get the LLM's response
             try:
-                # output = llm(prompt_template, max_tokens=250, stop=["<|user|>"], echo=False)
-                output = llm(prompt_template, max_tokens=500, stop=["<|user|>"], echo=False)
+                output = llm(prompt_template, max_tokens=250, stop=["<|user|>"], echo=False)
                 answer = output['choices'][0]['text'].strip()
                 
                 st.subheader("Answer:")
@@ -450,23 +449,9 @@ def render_rag_qa(df):
                 with st.expander("Show Retrieved Context (What the AI used to answer)"):
                     st.info("The AI's answer is based on the following property remarks:")
                     for i, idx in enumerate(retrieved_indices):
-                        # st.markdown(f"**Source {i+1} (Listing from {df.iloc[idx]['city']}):**")
-                        # st.write(f"> {df.iloc[idx]['remarks']}")
+                        st.markdown(f"**Source {i+1} (Listing from {df.iloc[idx]['city']}):**")
+                        st.write(f"> {df.iloc[idx]['remarks']}")
 
-                        # Using a more structured layout
-                        listing_row = df.iloc[idx]
-                        price_str = f"${int(listing_row.get('price', 0)):,}" if pd.notna(listing_row.get('price')) else "N/A"
-
-                        st.markdown(f"""
-                            **Source {i+1} (Listing from {df.iloc[idx]['city']}):**
-                            - **ID:** `{listing_row['id']}`
-                            - **Address:** {listing_row.get('address', 'N/A')}
-                            - **Price:** {price_str}
-                            - **Beds:** {listing_row.get('beds', 'N/A')} | **Baths:** {listing_row.get('baths', 'N/A')}
-                            """)
-                        # st.markdown(f"**Remarks:**")
-                        # st.info(f"{listing_row['remarks']}")
-                        st.write(f"Remarks: {df.iloc[idx]['remarks']}")
             except Exception as e:
                 st.error(f"An error occurred while generating the answer: {e}")
 

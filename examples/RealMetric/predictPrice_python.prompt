@@ -18,3 +18,6 @@ Handle the errors, Listing Q&A (RAG) is not giving the correct answers for speci
 Polish the UI improve it.
 
 Give error free functional code.
+
+For the QnA option, include the summary generation similar to below details:
+id, Address, Price, Beds, Baths, Remarks, Summary 
