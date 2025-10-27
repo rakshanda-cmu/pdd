@@ -1,0 +1,14 @@
+
+
+<test_calculator>
+  <include>test_calculator.py</include>
+</test_calculator>
+
+write a python function "calculator" which does the basic 4 functions of the calculations, it should ask user for the input , also have default null 3 parameters (2 numbers and one operator). It should display the operation performed and the result.
+
+Check for errors and ls
+Generate Error free code.
+
+
+# Instruction: Also generate code to Pass all the unit tests covering all scenarios in test_calculator.py
+Make sure that the generated code passes all the unit tests in test_calculator.py.

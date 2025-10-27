@@ -1,0 +1,13 @@
+Generate python Unit testcases for calculator.py, unit testcases should covere below scenarios:
+
+1. Multiple Calculations (Looping)
+
+2. Floating-Point Precision
+
+3. Empty Input Handling
+
+4. Non-numeric Input (Special Characters)
+
+5. Handling Edge Case for Negative Numbers (for display purposes)
+
+6. Large or Small Numbers (Overflow/Underflow)
